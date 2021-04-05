@@ -1,0 +1,62 @@
+version: "3.7"
+
+services:
+  node:
+    build:
+      context: ./services/nodejs
+      dockerfile: Dockerfile
+    restart: always
+    volumes:
+      - "./services/nodejs/:/usr/src/app"
+      - "/usr/src/app/node_modules"
+    ports:
+      - 80:3001
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+      - DB_URL=${DB_URL}
+    # depends_on:
+    #   - mongo
+
+  # mongo:
+  #   image: mongo
+  #   restart: always
+  #   environment:
+  #     MONGO_INITDB_ROOT_USERNAME: root
+  #     MONGO_INITDB_ROOT_PASSWORD: example
+
+  react:
+    build:
+      context: ./services/react
+      dockerfile: Dockerfile
+    volumes:
+      - "./services/react:/usr/src/app"
+      - "/usr/src/app/node_modules"
+    ports:
+      - 3000:3000
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+      - REACT_APP_API_URL=${REACT_APP_API_URL}
+      - OAUTH_ID=${OAUTH_ID}
+    depends_on:
+      - node
+    restart: always
+
+  nginx:
+    build:
+      context: ./services/nginx
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - 100:100
+    depends_on:
+      - node
+      - react
+
+  certbot:
+    image: certbot/certbot
+
+volumes:
+  data:
+    driver: "local"

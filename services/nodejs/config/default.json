@@ -1,0 +1,14 @@
+{
+	"logger": {
+		"level": "debug",
+		"appName": "reminder-app-nodejs"
+	},
+	"default_locale": "en-US",
+	"jwt": {
+		"expiresIn": "12h",
+		"secret": "gvoodevmxzxyulp"
+	},
+	"white_listed_sources": [
+		"http://localhost:3000"
+	]
+}
